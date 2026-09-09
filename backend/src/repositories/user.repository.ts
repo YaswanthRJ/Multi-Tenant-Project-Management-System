@@ -34,7 +34,7 @@ const userReturningColumns = `
   u.name,
   u.email,
   u.role_id,
-  r.name AS role_name,
+  (SELECT roles.name FROM roles WHERE roles.id = u.role_id) AS role_name,
   u.tenant_id,
   u.is_disabled,
   u.created_at,
@@ -154,27 +154,37 @@ export async function create(
   passwordHash: string,
   tenantId: string
 ): Promise<User> {
+  const inserted = await query<{ id: string }>(
+    `
+    INSERT INTO users (name, email, password_hash, role_id, tenant_id)
+    SELECT $1, $2, $3, r.id, $5
+    FROM roles r
+    WHERE r.name = $4
+    RETURNING id
+    `,
+    [input.name, input.email, passwordHash, input.role, tenantId]
+  );
+
+  const insertedId = inserted.rows[0]?.id;
+
+  if (!insertedId) {
+    throw new Error("User creation returned no row");
+  }
+
   const result = await query<UserRow>(
     `
-    WITH inserted AS (
-      INSERT INTO users (name, email, password_hash, role_id, tenant_id)
-      SELECT $1, $2, $3, r.id, $5
-      FROM roles r
-      WHERE r.name = $4
-      RETURNING id
-    )
     SELECT ${userReturningColumns}
     FROM users u
     JOIN roles r ON r.id = u.role_id
-    JOIN inserted i ON i.id = u.id
+    WHERE u.id = $1
     `,
-    [input.name, input.email, passwordHash, input.role, tenantId]
+    [insertedId]
   );
 
   const row = result.rows[0];
 
   if (!row) {
-    throw new Error("User creation returned no row");
+    throw new Error("Created user could not be loaded");
   }
 
   return mapUser(row);

@@ -28,3 +28,7 @@ export function updateUserPermissions(
     }
   );
 }
+
+export function getUserPermissions(userId: string): Promise<string[]> {
+  return get<string[]>(`/users/${userId}/permissions`);
+}

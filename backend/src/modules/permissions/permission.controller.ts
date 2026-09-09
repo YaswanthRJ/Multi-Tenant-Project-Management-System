@@ -1,10 +1,27 @@
 import type { Request, Response } from "express";
 
 import {
+  getUserPermissions as loadUserPermissions,
   listPermissions,
   setAdminRolePermissions,
   setUserPermissions as updateUserPermissions
 } from "./permission.service.js";
+
+export async function getUserPermissions(req: Request, res: Response) {
+  const id = req.params.id;
+
+  if (typeof id !== "string") {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+
+  const permissions = await loadUserPermissions(req.user!, id);
+
+  if (permissions === null) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  return res.status(200).json(permissions);
+}
 
 export async function list(_req: Request, res: Response) {
   return res.status(200).json(await listPermissions());

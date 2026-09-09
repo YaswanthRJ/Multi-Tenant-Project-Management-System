@@ -1,6 +1,7 @@
 import {
   findAllPermissions,
   findPermissionIdsByNames,
+  getEffectivePermissions,
   replaceRolePermissions,
   replaceUserPermissions
 } from "../../repositories/permission.repository.js";
@@ -28,6 +29,22 @@ export async function setAdminRolePermissions(
 
   await replaceRolePermissions("ADMIN", permissionIds);
   return true;
+}
+
+export async function getUserPermissions(
+  user: AuthenticatedUser,
+  targetUserId: string
+): Promise<string[] | null> {
+  const target = await findUserById(targetUserId);
+
+  if (
+    !target ||
+    (!isSuperAdmin(user) && target.tenant_id !== user.tenantId)
+  ) {
+    return null;
+  }
+
+  return getEffectivePermissions(target.id, target.role_id);
 }
 
 export async function setUserPermissions(

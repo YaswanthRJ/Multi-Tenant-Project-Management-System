@@ -65,13 +65,6 @@ export function Sidebar() {
             </NavLink>
           )}
 
-          <PermissionGate permission="permissions.manage">
-            <NavLink to="/permissions" className={navLinkClass}>
-              <PermissionsIcon />
-              <span>Permissions</span>
-            </NavLink>
-          </PermissionGate>
-
           {user?.role === "SUPER_ADMIN" && (
             <NavLink to="/tenants" className={navLinkClass}>
               <TenantsIcon />
@@ -148,21 +141,6 @@ function UsersIcon() {
       <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" />
       <path d="M16 5.2a3 3 0 0 1 0 5.6" />
       <path d="M18 14.2a6 6 0 0 1 3 5.2" />
-    </svg>
-  );
-}
-
-function PermissionsIcon() {
-  return (
-    <svg
-      className="h-5 w-5 shrink-0"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path d="M12 3 20 6v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6l8-3Z" />
-      <path d="m9 12 2 2 4-4" />
     </svg>
   );
 }

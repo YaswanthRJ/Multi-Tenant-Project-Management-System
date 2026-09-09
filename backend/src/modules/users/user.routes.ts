@@ -3,7 +3,10 @@ import { Router } from "express";
 import { requireAuth } from "../../middleware/auth.js";
 import { requirePermission } from "../../middleware/authorize.js";
 import { create, disable, list, update } from "./user.controller.js";
-import { setUserPermissions } from "../permissions/permission.controller.js";
+import {
+  getUserPermissions,
+  setUserPermissions
+} from "../permissions/permission.controller.js";
 
 const router = Router();
 
@@ -21,6 +24,12 @@ router.put(
   requireAuth,
   requirePermission("permissions.manage"),
   setUserPermissions
+);
+router.get(
+  "/:id/permissions",
+  requireAuth,
+  requirePermission("permissions.manage"),
+  getUserPermissions
 );
 
 export default router;
