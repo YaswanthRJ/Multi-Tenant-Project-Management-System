@@ -7,7 +7,7 @@ import { useAuth } from "../../auth/AuthProvider";
 import { TenantSelect } from "../../components/tenant/TenantSelect";
 import type { ProjectStatus } from "../../types/project";
 
-type ProjectFormMode = "create" | "edit";
+type ProjectFormMode = "create" | "edit" | "view";
 
 type ProjectFormProps = {
   mode: ProjectFormMode;
@@ -26,12 +26,12 @@ export function ProjectForm({ mode }: ProjectFormProps) {
   const [useCase, setUseCase] = useState("");
   const [status, setStatus] = useState<ProjectStatus>("DRAFT");
   const [tenantId, setTenantId] = useState("");
-  const [loadingProject, setLoadingProject] = useState(mode === "edit");
+  const [loadingProject, setLoadingProject] = useState(mode !== "create");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (mode !== "edit" || !id) {
+    if (mode === "create" || !id) {
       return;
     }
 
@@ -75,7 +75,7 @@ export function ProjectForm({ mode }: ProjectFormProps) {
       return;
     }
 
-    if (mode === "edit" && !id) {
+    if (mode !== "create" && !id) {
       setError("Project not found");
       return;
     }
@@ -110,9 +110,18 @@ export function ProjectForm({ mode }: ProjectFormProps) {
   }
 
   const isEditing = mode === "edit";
-  const heading = isEditing ? "Edit Project" : "Create Project";
-  const description = isEditing ? "Update project details" : "Create a new project";
-  const permission = isEditing ? "projects.update" : "projects.create";
+  const isViewing = mode === "view";
+  const heading = isViewing ? "View Project" : isEditing ? "Edit Project" : "Create Project";
+  const description = isViewing
+    ? "Project details"
+    : isEditing
+      ? "Update project details"
+      : "Create a new project";
+  const permission = isViewing
+    ? "projects.read"
+    : isEditing
+      ? "projects.update"
+      : "projects.create";
 
   return (
     <PermissionGate permission={permission}>
@@ -140,6 +149,7 @@ export function ProjectForm({ mode }: ProjectFormProps) {
               id="project-name"
               type="text"
               required
+              disabled={isViewing}
               value={name}
               onChange={(event) => setName(event.target.value)}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none"
@@ -154,6 +164,7 @@ export function ProjectForm({ mode }: ProjectFormProps) {
               id="project-address"
               type="text"
               required
+              disabled={isViewing}
               value={address}
               onChange={(event) => setAddress(event.target.value)}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none"
@@ -168,6 +179,7 @@ export function ProjectForm({ mode }: ProjectFormProps) {
               id="project-use-case"
               type="text"
               required
+              disabled={isViewing}
               value={useCase}
               onChange={(event) => setUseCase(event.target.value)}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none"
@@ -180,6 +192,7 @@ export function ProjectForm({ mode }: ProjectFormProps) {
             </label>
             <select
               id="project-status"
+              disabled={isViewing}
               value={status}
               onChange={(event) => setStatus(event.target.value as ProjectStatus)}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none"
@@ -201,24 +214,27 @@ export function ProjectForm({ mode }: ProjectFormProps) {
                 value={tenantId}
                 onChange={setTenantId}
                 required
+                disabled={isViewing}
               />
             </div>
           )}
 
           <div className="flex items-center gap-3">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
-            >
-              {saving ? (isEditing ? "Saving..." : "Creating...") : isEditing ? "Save" : "Create Project"}
-            </button>
+            {!isViewing && (
+              <button
+                type="submit"
+                disabled={saving}
+                className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+              >
+                {saving ? (isEditing ? "Saving..." : "Creating...") : isEditing ? "Save" : "Create Project"}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => navigate("/projects")}
               className="rounded-md px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
             >
-              Cancel
+              {isViewing ? "Back" : "Cancel"}
             </button>
           </div>
         </form>

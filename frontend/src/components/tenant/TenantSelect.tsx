@@ -8,6 +8,7 @@ type TenantSelectProps = {
   onChange: (tenantId: string) => void;
   allowCreate?: boolean;
   required?: boolean;
+  disabled?: boolean;
 };
 
 export function TenantSelect({
@@ -15,6 +16,7 @@ export function TenantSelect({
   onChange,
   allowCreate = false,
   required = false,
+  disabled = false,
 }: TenantSelectProps) {
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +84,7 @@ export function TenantSelect({
       <select
         id="tenant"
         required={required}
-        disabled={loading}
+        disabled={loading || disabled}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none"
@@ -97,7 +99,7 @@ export function TenantSelect({
         ))}
       </select>
 
-      {allowCreate && !showCreate && (
+      {allowCreate && !disabled && !showCreate && (
         <button
           type="button"
           onClick={() => {
@@ -110,7 +112,7 @@ export function TenantSelect({
         </button>
       )}
 
-      {allowCreate && showCreate && (
+      {allowCreate && !disabled && showCreate && (
         <div className="mt-3 rounded-md border border-gray-200 p-3">
           <label
             htmlFor="new-tenant-name"

@@ -24,6 +24,7 @@ export default function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/projects/new" element={<ProjectForm mode="create" />} />
+              <Route path="/projects/:id" element={<ProjectForm mode="view" />} />
               <Route path="/projects/:id/edit" element={<ProjectForm mode="edit" />} />
                <Route path="/users" element={<UsersPage />} />
               <Route path="/users/new/admin" element={<UserForm mode="create" fixedRole="ADMIN" />} />

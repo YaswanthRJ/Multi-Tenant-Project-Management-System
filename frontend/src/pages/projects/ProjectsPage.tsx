@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { ApiError } from "../../api/api";
-import { listProjects } from "../../api/projects.api";
+import { deleteProject, listProjects } from "../../api/projects.api";
 import { PermissionGate } from "../../auth/PermissionGate";
 import { type DataTableColumn, DataTable } from "../../components/table/DataTable";
 import type { ProjectStatus, Project } from "../../types/project";
@@ -28,6 +28,7 @@ export function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -64,6 +65,24 @@ export function ProjectsPage() {
     };
   }, []);
 
+  async function handleDelete(project: Project) {
+    if (!window.confirm(`Are you sure you want to delete ${project.name}?`)) {
+      return;
+    }
+
+    setError(null);
+    setDeletingProjectId(project.id);
+
+    try {
+      await deleteProject(project.id);
+      setProjects((current) => current.filter((item) => item.id !== project.id));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Failed to delete project");
+    } finally {
+      setDeletingProjectId(null);
+    }
+  }
+
   const columns: DataTableColumn<Project>[] = [
     { key: "name", header: "Name" },
     { key: "address", header: "Address" },
@@ -77,20 +96,38 @@ export function ProjectsPage() {
       key: "actions",
       header: "",
       render: (project) => (
-        <PermissionGate permission="projects.update">
-          <button
-            type="button"
-            aria-label={`Edit ${project.name}`}
-            title={`Edit ${project.name}`}
-            onClick={(event) => {
-              event.stopPropagation();
-              navigate(`/projects/${project.id}/edit`);
-            }}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
-          >
-            <Pencil className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </PermissionGate>
+        <div className="flex items-center gap-1">
+          <PermissionGate permission="projects.update">
+            <button
+              type="button"
+              aria-label={`Edit ${project.name}`}
+              title={`Edit ${project.name}`}
+              onClick={(event) => {
+                event.stopPropagation();
+                navigate(`/projects/${project.id}/edit`);
+              }}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+            >
+              <Pencil className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </PermissionGate>
+
+          <PermissionGate permission="projects.delete">
+            <button
+              type="button"
+              aria-label={`Delete ${project.name}`}
+              title={`Delete ${project.name}`}
+              disabled={deletingProjectId === project.id}
+              onClick={(event) => {
+                event.stopPropagation();
+                void handleDelete(project);
+              }}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </PermissionGate>
+        </div>
       ),
     },
   ];
