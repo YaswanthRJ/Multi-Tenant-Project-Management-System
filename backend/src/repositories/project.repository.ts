@@ -57,6 +57,23 @@ export async function findAllByTenantId(tenantId: string): Promise<Project[]> {
   return result.rows.map(mapProject);
 }
 
+export async function countAll(): Promise<number> {
+  const result = await query<{ count: string }>(
+    "SELECT COUNT(*) AS count FROM projects"
+  );
+
+  return Number(result.rows[0]?.count ?? 0);
+}
+
+export async function countByTenantId(tenantId: string): Promise<number> {
+  const result = await query<{ count: string }>(
+    "SELECT COUNT(*) AS count FROM projects WHERE tenant_id = $1",
+    [tenantId]
+  );
+
+  return Number(result.rows[0]?.count ?? 0);
+}
+
 export async function findById(id: string): Promise<Project | null> {
   const result = await query<ProjectRow>(
     `SELECT ${projectColumns} FROM projects WHERE id = $1 LIMIT 1`,

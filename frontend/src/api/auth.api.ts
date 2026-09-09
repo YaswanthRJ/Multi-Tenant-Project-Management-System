@@ -1,4 +1,4 @@
-import type { AuthenticatedUser } from "../types/auth";
+import type { AuthenticatedUser, DashboardStats } from "../types/auth";
 import { get, post } from "./api";
 
 type LoginResponse = {
@@ -25,4 +25,8 @@ export function logout(): Promise<LogoutResponse> {
 
 export function getMe(): Promise<AuthenticatedUser> {
   return get<AuthenticatedUser>("/me");
+}
+
+export function getDashboardStats(): Promise<DashboardStats> {
+  return get<DashboardStats>("/dashboard/stats");
 }

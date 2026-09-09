@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { KeyRound, Pencil, UserRoundCheck, UserRoundX } from "lucide-react";
 import { DataTable, type DataTableColumn } from "../../components/table/DataTable";
 import { PermissionGate } from "../../auth/PermissionGate";
 import { useAuth } from "../../auth/AuthProvider";
@@ -156,39 +157,49 @@ export function UsersPage() {
             <PermissionGate permission="users.update">
               <button
                 type="button"
+                aria-label={`Edit ${targetUser.name}`}
+                title={`Edit ${targetUser.name}`}
                 onClick={(event) => {
                   event.stopPropagation();
                   navigate(`/users/${targetUser.id}/edit`);
                 }}
-                className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
               >
-                Edit
+                <Pencil className="h-4 w-4" aria-hidden="true" />
               </button>
             </PermissionGate>
 
             <PermissionGate permission="users.disable">
               <button
                 type="button"
+                aria-label={`${targetUser.isDisabled ? "Enable" : "Disable"} ${targetUser.name}`}
+                title={`${targetUser.isDisabled ? "Enable" : "Disable"} ${targetUser.name}`}
                 onClick={(event) => {
                   event.stopPropagation();
                   handleToggleDisabled(targetUser);
                 }}
-                className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
               >
-                {targetUser.isDisabled ? "Enable" : "Disable"}
+                {targetUser.isDisabled ? (
+                  <UserRoundCheck className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <UserRoundX className="h-4 w-4" aria-hidden="true" />
+                )}
               </button>
             </PermissionGate>
 
             <PermissionGate permission="permissions.manage">
               <button
                 type="button"
+                aria-label={`Manage permissions for ${targetUser.name}`}
+                title={`Manage permissions for ${targetUser.name}`}
                 onClick={(event) => {
                   event.stopPropagation();
                   navigate(`/users/${targetUser.id}/permissions`);
                 }}
-                className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
               >
-                Permissions
+                <KeyRound className="h-4 w-4" aria-hidden="true" />
               </button>
             </PermissionGate>
           </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Pencil } from "lucide-react";
 import { ApiError } from "../../api/api";
 import { listProjects } from "../../api/projects.api";
 import { PermissionGate } from "../../auth/PermissionGate";
@@ -79,13 +80,15 @@ export function ProjectsPage() {
         <PermissionGate permission="projects.update">
           <button
             type="button"
+            aria-label={`Edit ${project.name}`}
+            title={`Edit ${project.name}`}
             onClick={(event) => {
               event.stopPropagation();
               navigate(`/projects/${project.id}/edit`);
             }}
-            className="text-sm font-medium text-gray-700 hover:text-gray-900"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
           >
-            Edit
+            <Pencil className="h-4 w-4" aria-hidden="true" />
           </button>
         </PermissionGate>
       ),

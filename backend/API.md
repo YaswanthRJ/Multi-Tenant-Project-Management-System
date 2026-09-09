@@ -94,10 +94,13 @@ Success: `200`
   {
     "id": 1,
     "name": "users.read",
-    "description": "View users"
+    "description": "View users",
+    "assignedToAdmin": true
   }
 ]
 ```
+
+`assignedToAdmin` indicates whether the permission is currently assigned to the `ADMIN` role.
 
 ### `PUT /permissions/admin`
 

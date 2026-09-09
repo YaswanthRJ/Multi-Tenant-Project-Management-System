@@ -4,11 +4,23 @@ export type Permission = {
   id: number;
   name: string;
   description: string | null;
+  assignedToAdmin: boolean;
 };
 
 export async function findAllPermissions(): Promise<Permission[]> {
   const result = await query<Permission>(
-    "SELECT id, name, description FROM permissions ORDER BY id"
+    `
+    SELECT
+      p.id,
+      p.name,
+      p.description,
+      rp.permission_id IS NOT NULL AS "assignedToAdmin"
+    FROM permissions p
+    LEFT JOIN role_permissions rp
+      ON rp.permission_id = p.id
+      AND rp.role_id = (SELECT id FROM roles WHERE name = 'ADMIN')
+    ORDER BY p.id
+    `
   );
 
   return result.rows;

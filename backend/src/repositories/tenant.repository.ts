@@ -28,6 +28,14 @@ export async function findAll(): Promise<Tenant[]> {
   return result.rows.map(mapTenant);
 }
 
+export async function count(): Promise<number> {
+  const result = await query<{ count: string }>(
+    "SELECT COUNT(*) AS count FROM tenants"
+  );
+
+  return Number(result.rows[0]?.count ?? 0);
+}
+
 export async function findById(id: string): Promise<Tenant | null> {
   const result = await query<TenantRow>(
     `

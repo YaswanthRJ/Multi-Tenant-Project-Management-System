@@ -8,3 +8,9 @@ export type AuthenticatedUser = {
   tenantId: string | null;
   permissions: string[];
 };
+
+export type DashboardStats = {
+  users?: number;
+  projects?: number;
+  tenants?: number;
+};

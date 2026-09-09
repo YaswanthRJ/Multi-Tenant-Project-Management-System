@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { ShieldCheck } from "lucide-react";
 import { useAuth } from "../../auth/AuthProvider";
 import { PermissionGate } from "../../auth/PermissionGate";
 
@@ -29,22 +30,13 @@ export function Sidebar() {
     <aside className="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200 bg-white">
       {/* Logo */}
       <div className="flex h-16 items-center border-b border-slate-200 px-6">
-        <div>
           <div className="text-base font-semibold tracking-tight text-slate-900">
             Project Management
           </div>
-          <div className="mt-0.5 text-xs text-slate-500">
-            Management Portal
-          </div>
-        </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-5">
-        <div className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Main
-        </div>
-
         <div className="space-y-1">
           <NavLink to="/" end className={navLinkClass}>
             <DashboardIcon />
@@ -71,27 +63,15 @@ export function Sidebar() {
               <span>Tenants</span>
             </NavLink>
           )}
+
+          <PermissionGate permission="permissions.manage">
+            <NavLink to="/permissions" className={navLinkClass}>
+              <ShieldCheck className="h-5 w-5 shrink-0" />
+              <span>Permissions</span>
+            </NavLink>
+          </PermissionGate>
         </div>
       </nav>
-
-      {/* User summary */}
-      <div className="border-t border-slate-200 p-3">
-        <div className="flex items-center gap-3 rounded-lg px-3 py-2">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
-            {user?.name?.charAt(0).toUpperCase()}
-          </div>
-
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-slate-900">
-              {user?.name}
-            </p>
-
-            <p className="truncate text-xs text-slate-500">
-              {user?.role}
-            </p>
-          </div>
-        </div>
-      </div>
     </aside>
   );
 }

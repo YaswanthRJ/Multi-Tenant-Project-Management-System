@@ -149,6 +149,23 @@ export async function findAllByTenantId(tenantId: string): Promise<User[]> {
   return result.rows.map(mapUser);
 }
 
+export async function countAll(): Promise<number> {
+  const result = await query<{ count: string }>(
+    "SELECT COUNT(*) AS count FROM users"
+  );
+
+  return Number(result.rows[0]?.count ?? 0);
+}
+
+export async function countByTenantId(tenantId: string): Promise<number> {
+  const result = await query<{ count: string }>(
+    "SELECT COUNT(*) AS count FROM users WHERE tenant_id = $1",
+    [tenantId]
+  );
+
+  return Number(result.rows[0]?.count ?? 0);
+}
+
 export async function create(
   input: UserInput,
   passwordHash: string,

@@ -1,8 +1,11 @@
-import type { AuthenticatedUser } from "../../types/auth.js";
+import type { AuthenticatedUser, DashboardStats } from "../../types/auth.js";
 import {
   findUserByEmail,
   findUserById
 } from "../../repositories/user.repository.js";
+import * as userRepository from "../../repositories/user.repository.js";
+import * as projectRepository from "../../repositories/project.repository.js";
+import * as tenantRepository from "../../repositories/tenant.repository.js";
 import { getEffectivePermissions } from "../../repositories/permission.repository.js";
 import { verifyPassword } from "../../utils/password.js";
 
@@ -60,4 +63,31 @@ export async function loadAuthenticatedUser(
   }
 
   return toAuthenticatedUser(user);
+}
+
+export async function dashboardStats(
+  user: AuthenticatedUser
+): Promise<DashboardStats> {
+  if (user.roleName === "SUPER_ADMIN") {
+    const [users, projects, tenants] = await Promise.all([
+      userRepository.countAll(),
+      projectRepository.countAll(),
+      tenantRepository.count()
+    ]);
+
+    return { users, projects, tenants };
+  }
+
+  if (user.roleName === "ADMIN") {
+    const [users, projects] = await Promise.all([
+      userRepository.countByTenantId(user.tenantId!),
+      projectRepository.countByTenantId(user.tenantId!)
+    ]);
+
+    return { users, projects };
+  }
+
+  return {
+    projects: await projectRepository.countByTenantId(user.tenantId!)
+  };
 }

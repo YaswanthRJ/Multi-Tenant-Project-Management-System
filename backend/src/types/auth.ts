@@ -10,6 +10,12 @@ export type AuthenticatedUser = {
   permissions: string[];
 };
 
+export type DashboardStats = {
+  projects?: number;
+  tenants?: number;
+  users?: number;
+};
+
 declare global {
   namespace Express {
     interface Request {

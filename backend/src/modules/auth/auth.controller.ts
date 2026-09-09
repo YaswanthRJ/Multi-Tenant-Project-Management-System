@@ -1,14 +1,22 @@
 import type { Request, Response } from "express";
 import { env } from "../../config/env.js";
 import { signAccessToken } from "../../utils/jwt.js";
-import { authenticateUser } from "./auth.service.js";
+import { authenticateUser, dashboardStats } from "./auth.service.js";
 import { AccountDisabledError } from "./auth.service.js";
 
 const cookieOptions = {
   httpOnly: true,
   secure: env.nodeEnv === "production",
   sameSite: "lax" as const,
+  path: "/",
   maxAge: 24 * 60 * 60 * 1000
+};
+
+const clearCookieOptions = {
+  httpOnly: true,
+  secure: env.nodeEnv === "production",
+  sameSite: "lax" as const,
+  path: "/"
 };
 
 export async function login(req: Request, res: Response) {
@@ -50,7 +58,7 @@ export async function login(req: Request, res: Response) {
 }
 
 export function logout(_req: Request, res: Response) {
-  res.clearCookie("access_token", cookieOptions);
+  res.clearCookie("access_token", clearCookieOptions);
 
   return res.json({
     message: "Logout successful"
@@ -72,4 +80,14 @@ export function me(req: Request, res: Response) {
     tenantId: req.user.tenantId,
     permissions: req.user.permissions
   });
+}
+
+export async function stats(req: Request, res: Response) {
+  if (!req.user) {
+    return res.status(401).json({
+      message: "Authentication required"
+    });
+  }
+
+  return res.json(await dashboardStats(req.user));
 }

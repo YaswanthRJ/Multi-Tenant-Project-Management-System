@@ -10,6 +10,7 @@ import { UserForm } from "./pages/users/UserForm";
 import { UsersPage } from "./pages/users/UsersPage";
 import { ManagePermissions } from "./pages/users/ManagePermissions";
 import { TenantsPage } from "./pages/tenants/TenantsPage";
+import { PermissionsPage } from "./pages/permissions/PermissionsPage";
 
 export default function App() {
   return (
@@ -29,7 +30,7 @@ export default function App() {
               <Route path="/users/new/agent" element={<UserForm mode="create" fixedRole="AGENT" />} />
               <Route path="/users/:id/edit" element={<UserForm mode="edit" />} />
               <Route path="/users/:id/permissions" element={<ManagePermissions />} />
-              <Route path="/permissions" element={<div>Permissions</div>} />
+              <Route path="/permissions" element={<PermissionsPage />} />
               <Route path="/tenants" element={<TenantsPage />} />
             </Route>
           </Route>
