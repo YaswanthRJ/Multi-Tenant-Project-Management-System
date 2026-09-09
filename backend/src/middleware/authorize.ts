@@ -44,3 +44,30 @@ export function requireSuperAdmin(
 
   next();
 }
+
+export function requireAdminOrSuperAdmin(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  if (!req.user) {
+    res.status(401).json({
+      message: "Authentication required"
+    });
+    return;
+  }
+
+  const isSuperAdmin =
+    req.user.roleName === "SUPER_ADMIN" && req.user.tenantId === null;
+  const isTenantAdmin =
+    req.user.roleName === "ADMIN" && req.user.tenantId !== null;
+
+  if (!isSuperAdmin && !isTenantAdmin) {
+    res.status(403).json({
+      message: "Forbidden"
+    });
+    return;
+  }
+
+  next();
+}

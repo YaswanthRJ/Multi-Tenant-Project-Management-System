@@ -39,7 +39,8 @@ export async function getUserPermissions(
 
   if (
     !target ||
-    (!isSuperAdmin(user) && target.tenant_id !== user.tenantId)
+    (!isSuperAdmin(user) &&
+      (target.tenant_id !== user.tenantId || target.role_name !== "AGENT"))
   ) {
     return null;
   }
@@ -56,7 +57,8 @@ export async function setUserPermissions(
 
   if (
     !target ||
-    (!isSuperAdmin(user) && target.tenant_id !== user.tenantId)
+    (!isSuperAdmin(user) &&
+      (target.tenant_id !== user.tenantId || target.role_name !== "AGENT"))
   ) {
     return null;
   }
